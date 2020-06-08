@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MP.Database;
 using MP.Domain.Models;
@@ -12,20 +13,19 @@ namespace Manage_Product.Controllers
     public class ProductController : ControllerBase
     {
         private readonly ApplicationDbContext _db; 
-        
         public ProductController(ApplicationDbContext db)
         {
             _db = db;
         }
 
-        // GET: api/value
+        // GET: api/product/getproduct
         [HttpGet("[action]")]
         public IActionResult GetProducts()
         {
             return Ok(_db.Products.ToList());
         }
 
-        // POST: api/value
+        // POST: api/product/addproduct
         [HttpPost("[action]")]
         public async Task<IActionResult> AddProduct([FromBody] Product formdata)
         {
@@ -39,11 +39,11 @@ namespace Manage_Product.Controllers
             };
             await _db.Products.AddAsync(newProduct);
             await _db.SaveChangesAsync();
-            return Ok();
+            return Ok(new JsonResult("The Product was added successfully"));
         }
 
-        // POST: api/product/1
-        [HttpPost("[action]")]
+        // PUT: api/product/updateproduct/{id}
+        [HttpPut("[action]/{id}")]
         public async Task<IActionResult> UpdateProduct([FromRoute] int id, [FromBody] Product formdata)
         {
             if (!ModelState.IsValid)
@@ -65,10 +65,11 @@ namespace Manage_Product.Controllers
 
             _db.Entry(findProduct).State = EntityState.Modified;
             await _db.SaveChangesAsync();
-            return Ok(new JsonResult("The Product with ID" + id + " is updated"));
+            return Ok(new JsonResult("The Product with ID " + id + " is updated"));
         }
 
-        [HttpDelete("[action]")]
+        // DELETE: api/product/deleteproduct/{id}
+        [HttpDelete("[action]/{id}")]
         public async Task<IActionResult> DeleteProduct([FromRoute] int id)
         {
             if (!ModelState.IsValid)
@@ -86,7 +87,7 @@ namespace Manage_Product.Controllers
             await _db.SaveChangesAsync();
 
             // Finally return 
-            return Ok(new JsonResult("The Product with ID" + id + " is deleted."));
+            return Ok(new JsonResult("The Product with ID " + id + " is deleted."));
         }
     }
 }
