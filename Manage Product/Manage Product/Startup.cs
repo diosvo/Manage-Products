@@ -26,6 +26,14 @@ namespace Manage_Product
             {
                 configuration.RootPath = "ClientApp/dist";
             });
+
+            services.AddCors(options =>
+            {
+                options.AddPolicy("EnableCORS", builder =>
+                {
+                    builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod().AllowCredentials().Build();
+                });
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -50,6 +58,7 @@ namespace Manage_Product
             }
 
             app.UseRouting();
+            app.UseCors("EnableCORS");
 
             app.UseEndpoints(endpoints =>
             {
