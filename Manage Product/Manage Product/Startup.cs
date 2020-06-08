@@ -30,15 +30,6 @@ namespace Manage_Product
                 configuration.RootPath = "ClientApp/dist";
             });
 
-            // Enable CORS
-            services.AddCors(options =>
-            {
-                options.AddPolicy("EnableCORS", builder =>
-                {
-                    builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod().AllowCredentials().Build();
-                });
-            });
-
             // Connect to Database
             services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
@@ -56,6 +47,9 @@ namespace Manage_Product
                 options.Lockout.MaxFailedAccessAttempts = 5;
                 options.Lockout.AllowedForNewUsers = true;
             }).AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders();
+
+            // Authentication Middleware
+            services.AddAuthentication().AddJwtBearer();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -80,7 +74,8 @@ namespace Manage_Product
             }
 
             app.UseRouting();
-            app.UseCors("EnableCORS");
+
+            app.UseCors(p => p.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
 
             app.UseEndpoints(endpoints =>
             {

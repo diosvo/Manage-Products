@@ -1,9 +1,12 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Microsoft.IdentityModel.Tokens;
 using MP.Domain.Models;
 using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace Manage_Product.Controllers
@@ -21,8 +24,9 @@ namespace Manage_Product.Controllers
             _signInManager = signInManager;
         }
 
-        [HttpPost("action")]
-        public async Task<IActionResult> Register([FromBody] RegisterView formdata) 
+        // Register Method
+        [HttpPost("[action]")]
+        public async Task<IActionResult> Register([FromBody] RegisterView formdata)
         {
             // Hold all the errors related to registration
             List<string> errorList = new List<string>();
@@ -52,6 +56,37 @@ namespace Manage_Product.Controllers
                 }
             }
             return BadRequest(new JsonResult(errorList));
+        }
+
+        // Login Method
+        [HttpPost("[action]")]
+        public async Task<IActionResult> LogIn([FromBody] LoginView formdata)
+        {
+            var user = await _userManager.FindByNameAsync(formdata.Username);
+            var roles = await _userManager.GetRolesAsync(user);
+
+            if (user != null && await _userManager.CheckPasswordAsync(user, formdata.Password))
+            {
+                // Confirmation of email
+                var tokenHandler = new JwtSecurityTokenHandler();
+                var tokenDescriptor = new SecurityTokenDescriptor
+                {
+                    Subject = new ClaimsIdentity(new Claim[]
+                    {
+                        new Claim(JwtRegisteredClaimNames.Sub, formdata.Username),
+                        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                        new Claim(ClaimTypes.NameIdentifier, user.Id),
+                        new Claim(ClaimTypes.Role, roles.FirstOrDefault()),
+                        new Claim("LoggedOn", DateTime.Now.ToString()),
+                    })
+                };
+                var token = tokenHandler.CreateToken(tokenDescriptor);
+                return Ok(new { token = tokenHandler.WriteToken(token), expirator = token.ValidTo, username = user.UserName, userRole = roles.FirstOrDefault() });
+            }
+
+            // Return error
+            ModelState.AddModelError("", "Username/ Password was not found.");
+            return Unauthorized(new { LoginError = "Please check the login credenticals - Invalid Username/ Password was entered. " });
         }
     }
 }
