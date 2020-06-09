@@ -35,7 +35,6 @@ namespace Manage_Product.Controllers
             {
                 Email = formdata.Email,
                 UserName = formdata.Username,
-                SecurityStamp = Guid.NewGuid().ToString()
             };
 
             var result = await _userManager.CreateAsync(user, formdata.Password);
@@ -63,25 +62,11 @@ namespace Manage_Product.Controllers
         public async Task<IActionResult> LogIn([FromBody] LoginView formdata)
         {
             var user = await _userManager.FindByNameAsync(formdata.Username);
-            var roles = await _userManager.GetRolesAsync(user);
 
             if (user != null && await _userManager.CheckPasswordAsync(user, formdata.Password))
             {
                 // Confirmation of email
-                var tokenHandler = new JwtSecurityTokenHandler();
-                var tokenDescriptor = new SecurityTokenDescriptor
-                {
-                    Subject = new ClaimsIdentity(new Claim[]
-                    {
-                        new Claim(JwtRegisteredClaimNames.Sub, formdata.Username),
-                        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                        new Claim(ClaimTypes.NameIdentifier, user.Id),
-                        new Claim(ClaimTypes.Role, roles.FirstOrDefault()),
-                        new Claim("LoggedOn", DateTime.Now.ToString()),
-                    })
-                };
-                var token = tokenHandler.CreateToken(tokenDescriptor);
-                return Ok(new { token = tokenHandler.WriteToken(token), expirator = token.ValidTo, username = user.UserName, userRole = roles.FirstOrDefault() });
+                return Ok(new { username = user.UserName });
             }
 
             // Return error

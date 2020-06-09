@@ -18,7 +18,7 @@ namespace Manage_Product.Controllers
             _db = db;
         }
 
-        // GET: api/product/getproduct
+        // GET: api/product/getproducts
         [HttpGet("[action]")]
         public IActionResult GetProducts()
         {

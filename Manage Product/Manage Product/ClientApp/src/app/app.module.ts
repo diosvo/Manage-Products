@@ -22,7 +22,7 @@ import { ProductComponent } from './pages/product/product.component';
     HttpClientModule,
     FormsModule,
     AppRoutingModule, 
-    RouterModule
+    RouterModule,
   ],
   providers: [],
   bootstrap: [AppComponent]
