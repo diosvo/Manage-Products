@@ -8,18 +8,16 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { HomeComponent } from './pages/home/home.component';
-import { ProductDetailsComponent } from './products/product-details/product-details.component';
 import { ProductListComponent } from './products/product-list/product-list.component';
-import { ProductsRoutingModule } from './products/products-routing.module';
+import { ProductDetailsComponent } from './products/product-details/product-details.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     NavbarComponent,
     HomeComponent,
-    ProductDetailsComponent,
     ProductListComponent,
-    // ProductsRoutingModule
+    ProductDetailsComponent
   ],
   imports: [
     BrowserModule,
