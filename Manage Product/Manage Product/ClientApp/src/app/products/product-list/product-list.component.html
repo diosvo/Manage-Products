@@ -1,6 +1,7 @@
 <button class="btn btn-warning float-right text-uppercase mb-4"><i class="fas fa-plus mr-2"></i>Add Product</button>
-<table class="table table-bordered row-border hover" style="width:100%;">
-    <thead class="text-center thead-dark">
+<table datatable [dtOptions]="dtOptions"  [dtTrigger]="dtTrigger" class="table table-bordered row-border hover"
+    style="width:100%;">
+    <thead class="text-center thead-dark"> 
         <tr>
             <th>ID</th>
             <th>Name</th>
@@ -11,14 +12,15 @@
             <th>Action</th>
         </tr>
     </thead>
+    <!-- -->
     <tbody>
-        <tr class="text-center">
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td><img style="float: right;" width="75" /></td>
+        <tr *ngFor="let product of products" class="text-center">
+            <td>{{product.productId}}</td>
+            <td>{{product.name | uppercase}}</td>
+            <td>{{product.description}}</td>
+            <td>{{product.OutOfStock ? 'No ' : 'Yes '}}</td>
+            <td>{{product.price | currency: 'VND':'symbol-narrow':'.3'}}</td>
+            <td><img [src]="product.imageUrl" *ngIf="product.imageUrl" style="float: right;" width="75" />Have not image yet!</td>
             <td>
                 <div class="btn-group" role="group">
                     <button type="button" class="btn btn-success"><i class="fas fa-list-ul"></i></button>

@@ -11,11 +11,12 @@ import { Product } from '../interfaces/product';
 
 export class ProductService {
     constructor(private http: HttpClient) { }
+    private url: string = "https://localhost:44301/";
 
-    private baseUrl: string = "api/product/getproducts"; // get 
-    private productUrl: string = "api/product/addproduct"; // insert - post
-    private deleteUrl: string = "api/product/deleteproduct/";
-    private updateUrl: string = "api/product/updateproduct/"; // update - put
+    private baseUrl: string = this.url + "api/product/getproducts"; // get 
+    private productUrl: string = this.url + "api/product/addproduct"; // insert - post
+    private deleteUrl: string = this.url + "api/product/deleteproduct/";
+    private updateUrl: string = this.url + "api/product/updateproduct/"; // update - put
     private product$: Observable<Product[]>;
 
     // Get All products

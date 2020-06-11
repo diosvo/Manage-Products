@@ -1,9 +1,10 @@
 import { Component, OnInit, ViewChild, TemplateRef } from '@angular/core';
 import { FormGroup, FormControl, Validators, FormBuilder } from '@angular/forms';
 import { DataTablesModule, DataTableDirective } from 'angular-datatables';
-import { BsModalRef} from 'ngx-bootstrap/modal';
+import { BsModalRef } from 'ngx-bootstrap/modal';
 import { Product } from 'src/app/interfaces/product';
 import { Observable, Subject } from 'rxjs';
+import { ProductService } from 'src/app/services/product.service';
 
 @Component({
   selector: 'app-product-list',
@@ -46,7 +47,7 @@ export class ProductListComponent implements OnInit {
 
   products: Product[] = [];
 
-  constructor() { }
+  constructor(private productService: ProductService) { }
 
   ngOnInit(): void {
     this.dtOptions = {
@@ -55,6 +56,12 @@ export class ProductListComponent implements OnInit {
       autoWidth: true,
       order: [[0, 'desc']]
     };
+
+    this.product$ = this.productService.getProducts();
+    this.product$.subscribe(result => { 
+      this.products = result;
+      this.dtTrigger.next();
+    });
   }
 
   insertForm() {
