@@ -1,8 +1,9 @@
 import { Component, OnInit, ViewChild, TemplateRef } from '@angular/core';
 import { FormGroup, FormControl, Validators, FormBuilder } from '@angular/forms';
+import { DataTablesModule, DataTableDirective } from 'angular-datatables';
 import { BsModalRef} from 'ngx-bootstrap/modal';
 import { Product } from 'src/app/interfaces/product';
-import { Observable } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 
 @Component({
   selector: 'app-product-list',
@@ -37,13 +38,31 @@ export class ProductListComponent implements OnInit {
   modalRef: BsModalRef;
   selectedProduct: Product;
   product$: Observable<Product[]>;
-  products: Product[] = [];
 
   // Data Tables Properties
+  dtOptions: DataTables.Settings = {};
+  dtTrigger: Subject<any> = new Subject();
+  @ViewChild(DataTableDirective) dtElement: DataTableDirective;
+
+  products: Product[] = [];
 
   constructor() { }
 
   ngOnInit(): void {
+    this.dtOptions = {
+      pagingType: 'full_numbers',
+      pageLength: 5,
+      autoWidth: true,
+      order: [[0, 'desc']]
+    };
+  }
+
+  insertForm() {
+
+  }
+
+  updateForm() {
+
   }
 
 }
