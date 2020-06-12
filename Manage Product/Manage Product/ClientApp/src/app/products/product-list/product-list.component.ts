@@ -1,11 +1,10 @@
-import { Component, OnInit, ViewChild, TemplateRef } from '@angular/core';
+import { Component, OnInit, ViewChild, TemplateRef, ChangeDetectorRef } from '@angular/core';
 import { FormGroup, FormControl, Validators, FormBuilder } from '@angular/forms';
 import { DataTableDirective } from 'angular-datatables';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { Product } from 'src/app/interfaces/product';
-import { Observable, Subject, Observer } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 import { ProductService } from 'src/app/services/product.service';
-
 
 @Component({
   selector: 'app-product-list',
@@ -51,9 +50,10 @@ export class ProductListComponent implements OnInit {
   constructor(private productService: ProductService,
     private modalService: BsModalService,
     private fb: FormBuilder,
-    ) { }
+    private chRef: ChangeDetectorRef
+  ) { }
 
-  // ---- ADD NEW PRODUCT ----
+  // ---->>> ADD NEW PRODUCT <<<----
   // Modal
   onAddProduct() {
     this.modalRef = this.modalService.show(this.modal);
@@ -72,11 +72,23 @@ export class ProductListComponent implements OnInit {
           this.products = newlist;
           this.modalRef.hide();
           this.insertForm.reset();
+          this.rerender();
         });
         console.log("New Product added");
       },
       error => console.log('Could not add Product')
     )
+  }
+
+  // Method to destroy old table and re-render new table
+  rerender() {
+    this.dtElement.dtInstance.then((dtInstance: DataTables.Api) => {
+      // Destroy table first in the current context
+      dtInstance.destroy();
+
+      // Call the dtTrigger to rerender again
+      this.dtTrigger.next()
+    });
   }
 
   // ---- EDIT PRODUCT ----
@@ -85,7 +97,6 @@ export class ProductListComponent implements OnInit {
     this.modalRef = this.modalService.show(this.editmodal);
   }
 
-  
   ngOnInit(): void {
     this.dtOptions = {
       pagingType: 'full_numbers',
@@ -97,6 +108,7 @@ export class ProductListComponent implements OnInit {
     this.product$ = this.productService.getProducts(); // Show data on web
     this.product$.subscribe(result => {
       this.products = result;
+      this.chRef.detectChanges();
       this.dtTrigger.next();
     });
 
@@ -105,22 +117,14 @@ export class ProductListComponent implements OnInit {
 
     ///// Initalizing ADD PRODUCT properties
     let validateImageUrl: string = '/(https?:\/\/.*\.(?:png|jpg))/i';
-    // let validateImageUrl : string = '/assets/*.(?:png|jpg)';
 
-    // this.insertForm = new FormGroup({
-    //   name: new FormControl('', [Validators.required, Validators.maxLength(50)]),
-    //   price: new FormControl('', [Validators.required, Validators.min(0)]),
-    //   description: new FormControl('', [Validators.required, Validators.maxLength(150)]),
-    //   imageUrl: new FormControl('', [Validators.pattern(validateImageUrl)])
-    //   // imageUrl: new FormControl('', [Validators.required])
-    // });
-    this.insertForm = new FormGroup ({
-      name : new FormControl('', [Validators.required, Validators.maxLength(50)]),
-      price : new FormControl('', [Validators.required, Validators.min(0)]),
-      description : new FormControl('', [Validators.required, Validators.maxLength(150)]),
-      imageUrl : new FormControl('', [Validators.pattern(validateImageUrl)])
+    this.insertForm = new FormGroup({
+      name: new FormControl('', [Validators.required, Validators.maxLength(50)]),
+      price: new FormControl('', [Validators.required, Validators.min(0)]),
+      description: new FormControl('', [Validators.required, Validators.maxLength(150)]),
+      imageUrl: new FormControl('', [Validators.pattern(validateImageUrl)])
     })
-    
+
     this.insertForm = this.fb.group({
       'name': this.name,
       'price': this.price,
@@ -129,6 +133,10 @@ export class ProductListComponent implements OnInit {
       'OutOfStock': true,
     });
     this.updateForm = this.fb.group({});
-
+  }
+  
+  // Do not forget unsubcribe
+  ngOnDestroy() {
+    this.dtTrigger.unsubscribe();
   }
 }

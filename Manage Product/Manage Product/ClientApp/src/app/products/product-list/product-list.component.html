@@ -19,9 +19,9 @@
             <td>{{product.productId}}</td>
             <td>{{product.name | uppercase}}</td>
             <td>{{product.description}}</td>
-            <td>{{true == product.OutOfStock ? 'No' : 'Yes ' }}</td>
+            <td>{{false == product.OutOfStock ? 'No' : 'Yes ' }}</td>
             <td>{{product.price | currency: 'VND':'symbol-narrow':'.3'}}</td>
-            <td><img  [src]="product.imageUrl" *ngIf="product.imageUrl" style="width:100px;" /></td>
+            <td><img [src]="product.imageUrl" *ngIf="product.imageUrl" style="width:100px;" /></td>
             <td>
                 <div class="btn-group" role="group">
                     <button type="button" class="btn btn-success"><i class="fas fa-list-ul"></i></button>
@@ -103,8 +103,8 @@
                         <div class="input-group-prepend">
                             <span class="input-group-text" id="ImageUrl"><i class="fa fa-picture-o"></i></span>
                         </div>
-                        <input type="text" class="form-control" formControlName="imageUrl" placeholder="eg: https://i.imgur.com/ApYPYbQ.jpg"
-                            aria-label="ImageUrl" aria-describedby="productTitle">
+                        <input type="text" class="form-control" formControlName="imageUrl"
+                            placeholder="Product Image Url" aria-label="ImageUrl" aria-describedby="productTitle">
                     </div>
                 </li>
                 <li class="list-group-item">
@@ -180,7 +180,7 @@
                         <div class="input-group-prepend">
                             <span class="input-group-text"><i class="fa fa-usd"></i></span>
                         </div>
-                        <input formControlName="price" type="text" class="form-control" placeholder="Product Price">
+                        <input formControlName="price" type="number" class="form-control" placeholder="Product Price">
                     </div>
                     <div class="errorMessage">
                         <span style="color: red;">Required</span>

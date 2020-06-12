@@ -30,7 +30,6 @@ import { ModalModule } from 'ngx-bootstrap/modal';
     RouterModule,
     DataTablesModule,
     ModalModule.forRoot()
-   
   ],
   providers: [],
   bootstrap: [AppComponent]
