@@ -24,6 +24,7 @@
     "datatables.net": "^1.10.21",
     "datatables.net-dt": "^1.10.21",
     "jquery": "^3.5.1",
+    "ng-config-service": "^0.1.8",
     "ngx-bootstrap": "^5.6.1",
     "popper.js": "^1.16.1",
     "rxjs": "~6.5.4",

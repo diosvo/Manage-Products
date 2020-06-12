@@ -11,6 +11,7 @@ import { HomeComponent } from './pages/home/home.component';
 import { ProductListComponent } from './products/product-list/product-list.component';
 import { ProductDetailsComponent } from './products/product-details/product-details.component';
 import { DataTablesModule } from 'angular-datatables';
+import { ModalModule } from 'ngx-bootstrap/modal';
 
 @NgModule({
   declarations: [
@@ -18,7 +19,7 @@ import { DataTablesModule } from 'angular-datatables';
     NavbarComponent,
     HomeComponent,
     ProductListComponent,
-    ProductDetailsComponent
+    ProductDetailsComponent,
   ],
   imports: [
     BrowserModule,
@@ -27,7 +28,9 @@ import { DataTablesModule } from 'angular-datatables';
     ReactiveFormsModule,
     AppRoutingModule, 
     RouterModule,
-    DataTablesModule
+    DataTablesModule,
+    ModalModule.forRoot()
+   
   ],
   providers: [],
   bootstrap: [AppComponent]

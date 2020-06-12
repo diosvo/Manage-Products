@@ -1,7 +1,8 @@
-<button class="btn btn-warning float-right text-uppercase mb-4"><i class="fas fa-plus mr-2"></i>Add Product</button>
-<table datatable [dtOptions]="dtOptions"  [dtTrigger]="dtTrigger" class="table table-bordered row-border hover"
+<button class="btn btn-warning float-right text-uppercase mb-4" (click)="onAddProduct()"><i
+        class="fas fa-plus mr-2"></i>Add Product</button>
+<table datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger" class="table table-bordered row-border hover"
     style="width:100%;">
-    <thead class="text-center thead-dark"> 
+    <thead class="text-center thead-dark">
         <tr>
             <th>ID</th>
             <th>Name</th>
@@ -18,13 +19,14 @@
             <td>{{product.productId}}</td>
             <td>{{product.name | uppercase}}</td>
             <td>{{product.description}}</td>
-            <td>{{product.OutOfStock ? 'No ' : 'Yes '}}</td>
+            <td>{{true == product.OutOfStock ? 'No' : 'Yes ' }}</td>
             <td>{{product.price | currency: 'VND':'symbol-narrow':'.3'}}</td>
-            <td><img [src]="product.imageUrl" *ngIf="product.imageUrl" style="float: right;" width="75" />Have not image yet!</td>
+            <td><img  [src]="product.imageUrl" *ngIf="product.imageUrl" style="width:100px;" /></td>
             <td>
                 <div class="btn-group" role="group">
                     <button type="button" class="btn btn-success"><i class="fas fa-list-ul"></i></button>
-                    <button type="button" class="btn btn-primary"><i class="fas fa-edit"></i></button>
+                    <button type="button" class="btn btn-primary" (click)="onEditProduct()"><i
+                            class="fas fa-edit"></i></button>
                     <button type="button" class="btn btn-danger"><i class="fas fa-trash-alt"></i></button>
                 </div>
             </td>
@@ -36,13 +38,13 @@
 <ng-template #template>
     <div class="modal-header">
         <h4 class="modal-title">ADD NEW PRODUCT</h4>
-        <button type="button" class="close pull-right" aria-label="Close">
+        <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
             <span aria-hidden="true">&times;</span>
         </button>
     </div>
     <div class="modal-body text-center">
-        <p class="list-group-item active text-center text-uppercase"></p>
-        <form [formGroup]="insertForm">
+        <p class="list-group-item active text-center text-uppercase">{{modalMessage}}</p>
+        <form [formGroup]="insertForm" (ngSubmit)="onSubmit()">
             <ul class="list-group">
                 <li class="list-group-item">
                     <div class="input-group">
@@ -51,11 +53,11 @@
                                     class="fa fa-pencil-square-o"></i></span>
                         </div>
                         <input type="text" id="name" formControlName="name" class="form-control"
-                            placeholder="eg: Macbook Air 2019" aria-label="name" aria-describedby="productTitle">
+                            placeholder="eg: Product Name" aria-label="name" aria-describedby="productTitle">
                     </div>
                     <div class="errorMessage">
-                        <span>Product Name is required.</span>
-                        <span>Only 50 characters allowed for Product Name.</span>
+                        <span style="color: red;">Required</span>
+                        <span>. Only 50 characters allowed for Product Name.</span>
                     </div>
                 </li>
                 <li class="list-group-item">
@@ -69,15 +71,15 @@
                             aria-describedby="productDescription"></textarea>
                     </div>
                     <div class="errorMessage">
-                        <span>Product Description is required.</span>
-                        <span>Only 150 characters allowed for Product Description.</span>
+                        <span style="color: red;">Required</span>
+                        <span>. Only 150 characters allowed for Product Description.</span>
                     </div>
                 </li>
                 <li class="list-group-item">
                     <div class="input-group">
                         <div class="input-group-prepend">
                             <div class="input-group-text">
-                                <input type="checkbox" formControlName="outOfStock" checked
+                                <input type="checkbox" formControlName="OutOfStock" checked
                                     aria-label="Checkbox for following text input">
                             </div>
                         </div>
@@ -89,12 +91,11 @@
                         <div class="input-group-prepend">
                             <span class="input-group-text"><i class="fa fa-usd"></i></span>
                         </div>
-                        <input formControlName="price" type="text" class="form-control" placeholder="eg: 999.99">
+                        <input formControlName="price" type="number" class="form-control" placeholder="Product Price">
                     </div>
                     <div class="errorMessage">
-                        <span>Product Price is required.</span>
-                        <span>Negative price Not allowed</span>
-                        <span>Max price allowes is 10000</span>
+                        <span style="color: red;">Required</span>
+                        <span>. Negative price Not allowed</span>
                     </div>
                 </li>
                 <li class="list-group-item">
@@ -102,15 +103,12 @@
                         <div class="input-group-prepend">
                             <span class="input-group-text" id="ImageUrl"><i class="fa fa-picture-o"></i></span>
                         </div>
-                        <input type="text" class="form-control" placeholder="eg: https://i.imgur.com/ApYPYbQ.jpg"
+                        <input type="text" class="form-control" formControlName="imageUrl" placeholder="eg: https://i.imgur.com/ApYPYbQ.jpg"
                             aria-label="ImageUrl" aria-describedby="productTitle">
-                    </div>
-                    <div class="errorMessage">
-                        <span>Invalid image url.</span>
                     </div>
                 </li>
                 <li class="list-group-item">
-                    <button class="btn btn-primary btn-block">ADD</button>
+                    <button [disabled]="!insertForm.valid" class="btn btn-primary btn-block">ADD</button>
                 </li>
             </ul>
         </form>
@@ -121,7 +119,7 @@
 <ng-template #editTemplate>
     <div class="modal-header">
         <h4 class="modal-title">EDIT PRODUCT DETAILS</h4>
-        <button type="button" class="close pull-right" aria-label="Close">
+        <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
             <span aria-hidden="true">&times;</span>
         </button>
     </div>
@@ -134,7 +132,7 @@
                         <div class="input-group-prepend">
                             <span class="input-group-text" id="productId"><i class="fa fa-key"></i></span>
                         </div>
-                        <input type="text" class="form-control" formControlName="id" />
+                        <input type="text" class="form-control" formControlName="id" placeholder="Product ID" />
                     </div>
                 </li>
                 <li class="list-group-item">
@@ -144,11 +142,11 @@
                                     class="fa fa-pencil-square-o"></i></span>
                         </div>
                         <input type="text" id="name" formControlName="name" class="form-control"
-                            placeholder="eg: Macbook Air 2019" aria-label="name" aria-describedby="productTitle">
+                            placeholder="eg: Product Name" aria-label="name" aria-describedby="productTitle">
                     </div>
                     <div class="errorMessage">
-                        <span>Product Name is required.</span>
-                        <span>Only 50 characters allowed for Product Name.</span>
+                        <span style="color: red;">Required</span>
+                        <span>. Only 50 characters allowed for Product Name.</span>
                     </div>
                 </li>
                 <li class="list-group-item">
@@ -162,15 +160,15 @@
                             aria-describedby="productDescription"></textarea>
                     </div>
                     <div class="errorMessage">
-                        <span>Product Description is required.</span>
-                        <span>Only 150 characters allowed for Product Description.</span>
+                        <span style="color: red;">Required</span>
+                        <span>. Only 150 characters allowed for Product Description.</span>
                     </div>
                 </li>
                 <li class="list-group-item">
                     <div class="input-group">
                         <div class="input-group-prepend">
                             <div class="input-group-text">
-                                <input type="checkbox" formControlName="outOfStock" checked
+                                <input type="checkbox" formControlName="OutOfStock" checked
                                     aria-label="Checkbox for following text input">
                             </div>
                         </div>
@@ -182,12 +180,11 @@
                         <div class="input-group-prepend">
                             <span class="input-group-text"><i class="fa fa-usd"></i></span>
                         </div>
-                        <input formControlName="price" type="text" class="form-control" placeholder="eg: 999.99">
+                        <input formControlName="price" type="text" class="form-control" placeholder="Product Price">
                     </div>
                     <div class="errorMessage">
-                        <span>Product Price is required.</span>
-                        <span>Negative price Not allowed</span>
-                        <span>Max price allowes is 10000</span>
+                        <span style="color: red;">Required</span>
+                        <span>. Negative price Not allowed. </span>
                     </div>
                 </li>
                 <li class="list-group-item">
