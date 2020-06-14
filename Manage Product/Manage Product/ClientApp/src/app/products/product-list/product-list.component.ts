@@ -103,6 +103,20 @@ export class ProductListComponent implements OnInit {
     )
   }
 
+  //// ---->> DELETE PRODUCT <<----
+  onDelete(product: Product) : void {
+    this.productService.deleteProduct(product.productId).subscribe(result => {
+      this.productService.clearCache();
+      this.product$ = this.productService.getProducts();
+      console.log('Delete Successfully.');
+      this.product$.subscribe(newlist => {
+        this.products = newlist;
+        this.rerender();
+      })
+    })
+
+  }
+
   ////// ---- System ----
   ngOnInit(): void {
     this.dtOptions = {
