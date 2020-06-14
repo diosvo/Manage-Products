@@ -53,7 +53,7 @@ export class ProductListComponent implements OnInit {
     private chRef: ChangeDetectorRef
   ) { }
 
-  // ---->>> ADD NEW PRODUCT <<<----
+  ///// ---->>> ADD NEW PRODUCT <<<----
   // Modal
   onAddProduct() {
     this.modalRef = this.modalService.show(this.modal);
@@ -80,23 +80,30 @@ export class ProductListComponent implements OnInit {
     )
   }
 
-  // Method to destroy old table and re-render new table
-  rerender() {
-    this.dtElement.dtInstance.then((dtInstance: DataTables.Api) => {
-      // Destroy table first in the current context
-      dtInstance.destroy();
-
-      // Call the dtTrigger to rerender again
-      this.dtTrigger.next()
-    });
-  }
-
-  // ---- EDIT PRODUCT ----
-  // Edit Product
-  onEditProduct() {
+  //// ---->>> EDIT PRODUCT <<<----
+  // Modal
+  onUpdateModal(id) {
     this.modalRef = this.modalService.show(this.editmodal);
   }
 
+  // Method to update an existing Product
+  onUpdate() {
+    let editProduct = this.updateForm.value;
+    this.productService.updateProduct(editProduct.id, editProduct).subscribe(
+      result => {
+        console.log('Product Updated');
+        this.productService.clearCache();
+        this.product$ = this.productService.getProducts();
+        this.product$.subscribe(updateList => {
+          this.products = updateList;
+          this.modalRef.hide();
+          this.rerender();
+        }, error => console.log('Could not update product'))
+      }
+    )
+  }
+
+  ////// ---- System ----
   ngOnInit(): void {
     this.dtOptions = {
       pagingType: 'full_numbers',
@@ -123,7 +130,7 @@ export class ProductListComponent implements OnInit {
       price: new FormControl('', [Validators.required, Validators.min(0)]),
       description: new FormControl('', [Validators.required, Validators.maxLength(150)]),
       imageUrl: new FormControl('', [Validators.pattern(validateImageUrl)])
-    })
+    });
 
     this.insertForm = this.fb.group({
       'name': this.name,
@@ -132,11 +139,38 @@ export class ProductListComponent implements OnInit {
       'imageUrl': this.imageUrl,
       'OutOfStock': true,
     });
-    this.updateForm = this.fb.group({});
+
+    ///// Initalizing EDIT PRODUCT properties
+    this.updateForm = new FormGroup({
+      _name: new FormControl('', [Validators.required, Validators.maxLength(50)]),
+      _price: new FormControl('', [Validators.required, Validators.min(0)]),
+      _description: new FormControl('', [Validators.required, Validators.maxLength(150)]),
+      _imageUrl: new FormControl('', [Validators.pattern(validateImageUrl)]),
+      _id: new FormControl()
+    });
+
+    this.updateForm = this.fb.group({
+      'id': this._id,
+      'name': this._name,
+      'price': this._price,
+      'description': this._description,
+      'imageUrl': this._imageUrl,
+      'OutOfStock': true
+    });
   }
-  
+
   // Do not forget unsubcribe
   ngOnDestroy() {
     this.dtTrigger.unsubscribe();
+  }
+  // Method to destroy old table and re-render new table
+  rerender() {
+    this.dtElement.dtInstance.then((dtInstance: DataTables.Api) => {
+      // Destroy table first in the current context
+      dtInstance.destroy();
+
+      // Call the dtTrigger to rerender again
+      this.dtTrigger.next()
+    });
   }
 }
